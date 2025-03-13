@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: django_app
+    command: gunicorn --bind 0.0.0.0:8000 myproject.wsgi:application
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file:
+      - .env
+
+ # db:
+  #  image: postgres:15
+   # container_name: postgres_db
+    # restart: always
+    #environment:
+     # POSTGRES_DB: mydatabase
+      # POSTGRES_USER: myuser
+      #POSTGRES_PASSWORD: mypassword
+    #ports:
+     # - "5432:5432"
+   # volumes:
+  #  - postgres_data:/var/lib/postgresql/data
+
+# volumes:
+  # postgres_data:
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx_proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"  # Enable HTTPS
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - /etc/letsencrypt:/etc/letsencrypt  # Mount SSL certs
+      - /var/www/certbot:/var/www/certbot  # Certbot webroot
+    depends_on:
+      - web
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/www/certbot:/var/www/certbot
+    entrypoint: [ "/bin/sh", "-c" ]
+    command: "certbot certonly --webroot --webroot-path=/var/www/certbot --email your-email@example.com --agree-tos --no-eff-email --staging -d yourdomain.com -d www.yourdomain.com"

@@ -1,0 +1,17 @@
+<!--This page overrides the base.html file and replaces the blocks-->
+
+{% extends 'base.html'%} <!--Specifies That this page is an extension of base.html-- >
+{% load static %}
+
+{% block title %}
+    Contact Page
+{% endblock title %}
+
+{% block extrahead %}
+    <link rel="stylesheet" href="{% static 'css/contact.css' %}" />
+{% endblock extrahead %}
+
+{% block content %}
+    <p>this is the Contact page!</p>
+{% endblock content %}
+
